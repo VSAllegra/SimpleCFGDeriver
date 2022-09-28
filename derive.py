@@ -1,5 +1,10 @@
 import sys, getopt
 
+def find_combinations(cfgDict, len):
+
+   print()
+
+
 def create_Dictionary(inputfile):
    retDict = dict()
    for line in open(inputfile, 'r'):
@@ -12,7 +17,7 @@ def create_Dictionary(inputfile):
          retDict[key] = [retDict[key], valueToAdd]
       else:
          retDict[key] = valueToAdd
-      print(retDict)
+      
 
    return retDict
 
@@ -33,6 +38,8 @@ def main(argv):
          exit(1)
    inputfile = args[0]
    cfgDict = create_Dictionary(inputfile)
+   find_combinations(cfgDict, length)
+   
 
 
 
