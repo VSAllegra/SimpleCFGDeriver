@@ -1,4 +1,3 @@
-N = D
-N = N D
-D = 0
-D = 1
+expr = expr + expr
+expr = ( expr )
+expr = id
