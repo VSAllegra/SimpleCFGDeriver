@@ -1,8 +1,6 @@
 //fpc 3.0.4
 
 program dt;
-var
-   md : integer;
 type  
    day_range = 1 .. 31;
    month_range = 1 .. 12;
@@ -12,8 +10,6 @@ type
        m : month_range;
        y : integer;
    public
-       procedure set_max_date (max_date : integer); 
-       
        function get_day (day : day_range);
        
        function get_month (month : month_range);
@@ -39,36 +35,33 @@ type
        function month_length (month : month_range; leap : boolean) : day_range; 
 end;
 
-date_t.procedure set_max_date (max_date : integer); 
-begin
-    md := max_date;
-end;
-
-date_t.function get_day ();
+function date_t.get_day ();
 begin 
    get_day := d;
 end;
        
-date_t.function get_month ();
+function date_t.get_month ();
 begin
     get_month := m;
 end;
        
-date_t.function get_year ();
+function date_t.get_year ();
 begin
     get_year := y;
 end;
        
-date_t.procedure init_date1 ();
+procedure date_t.init_date1 ();
      
-date_t.procedure init_date (day : day_range; month : month_range; year : integer);
+procedure date_t.init_date (day : day_range; month : month_range; year : integer);
 begin
-    d := day;
-    m := month;
     y := year;
+    m := month;
+    d := day;
+    if (d > month_length(m, leap_year(y))) then
+        writeln(StdErr, 'Date is Invalid'); 
 end;
        
-date_t.function date_equal (date2 : date_t) : boolean;
+function date_t.date_equal (date2 : date_t) : boolean;
 begin
     date_equal := false;
     if d = date2.get_date then 
@@ -77,7 +70,7 @@ begin
                 date_equal := true;
 end;      
        
-date_t.function date_less_than (date2 : date_t) : boolean;
+function date_t.date_less_than (date2 : date_t) : boolean;
 begin 
     date_less_than := false;
     if y < date2.get_year then 
@@ -100,7 +93,7 @@ begin
             date_less_than := false;
 end;  
        
-date_t.function month_str (month : month_range) : string;
+function date_t.month_str (month : month_range) : string;
 begin
     case (month) of
         1 : month_str := 'January';
@@ -120,19 +113,33 @@ begin
         writeln(StdErr, month, ' is not a valid month');
 end;
 
-date_t.procedure formatdate (var dt : date_t; var ret_str : string); 
+procedure date_t.formatdate (var ret_str : string); 
 begin 
-    ret_str := month_str(dt.get_month) + ' ' + IntToStr(dt.get_day) + ',' + IntToStr(dt.get_year);
+    ret_str := month_str(m) + ' ' + IntToStr(d) + ',' + IntToStr(y);
 end;
 
-date_t.procedure next_day (var dt : date_t);
+procedure date_t.next_day ();
+begin
+    if d + 1 <= month_length(m, leap_year(y)) then
+        Inc(d);
+    else
+        d := 1;
+        if m = 12 then
+            m := 1
+            Inc(y)
+        else
+            Inc(m);
+end;
+
+
+
        
-date_t.function leap_year (year : integer) : boolean;
+function date_t.leap_year (year : integer) : boolean;
 begin
     leap_year := year mod 4 = 0;
 end;
        
-date_t.function month_length (month : month_range; leap : boolean) : day_range; 
+function date_t.month_length (month : month_range; leap : boolean) : day_range; 
 begin 
     if (month mod 2 = 1 or month = 8) then
     begin 
