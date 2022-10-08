@@ -1,3 +1,4 @@
-expr = expr + expr
-expr = ( expr )
-expr = id
+N = D
+N = N D
+D = 0
+D = 1

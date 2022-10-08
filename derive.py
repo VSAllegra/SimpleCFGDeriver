@@ -1,3 +1,5 @@
+#Vinny ALlegra , Simple Deriver for CFGs 
+
 from ast import Str
 from asyncio.windows_events import NULL
 import sys, getopt
@@ -28,9 +30,12 @@ def find_combinations(cfgDict, length):
             comboSet.add(stringToModify) 
    setList = list(comboSet)
    setList.sort()
+   print()
    for combo in setList:
       print(combo)
+   print()
    print("\n# of strings generated: " + str(len(setList)) + "\n")
+   print()
  
 # param inputfile: file to get the cfg from
 def create_Dictionary(inputfile):
