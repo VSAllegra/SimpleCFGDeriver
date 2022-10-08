@@ -1,6 +1,7 @@
 //fpc 3.0.4
 
 program dt;
+Uses sysutils;
 type  
    day_range = 1 .. 31;
    month_range = 1 .. 12;
@@ -10,47 +11,49 @@ type
        m : month_range;
        y : integer;
    public
-       function get_day (day : day_range);
+       function get_day () : day_range;
        
-       function get_month (month : month_range);
+       function get_month () : month_range;
        
-       function get_year (year : integer);
+       function get_year () : integer;
        
-       procedure init_date1 (var dt : date_t);
+       procedure init_date1 ();
        
-       procedure init_date (var dt : date_t; day : day_range; month : month_range; year : integer);
+       procedure init_date (day : day_range; month : month_range; year : integer);
        
-       function date_equal (date1: date_t; date2 : date_t) : boolean;
+       function date_equal (date2 : date_t) : boolean;
        
-       function date_less_than (date1 : date_t; date2 : date_t) : boolean;
+       function date_less_than (date2 : date_t) : boolean;
        
        function month_str (month : month_range) : string;
        
-       procedure format_date (var dt : date_t; var ret_str : string); 
+       procedure format_date (var ret_str : string); 
        
-       procedure next_day (var dt : date_t);
+       procedure next_day ();
        
        function leap_year (year : integer) : boolean;
        
        function month_length (month : month_range; leap : boolean) : day_range; 
 end;
 
-function date_t.get_day ();
+function date_t.get_day () : day_range;
 begin 
    get_day := d;
 end;
        
-function date_t.get_month ();
+function date_t.get_month () : month_range;
 begin
     get_month := m;
 end;
        
-function date_t.get_year ();
+function date_t.get_year () : integer;
 begin
     get_year := y;
 end;
        
 procedure date_t.init_date1 ();
+begin
+end;
      
 procedure date_t.init_date (day : day_range; month : month_range; year : integer);
 begin
@@ -64,7 +67,7 @@ end;
 function date_t.date_equal (date2 : date_t) : boolean;
 begin
     date_equal := false;
-    if d = date2.get_date then 
+    if d = date2.get_day then 
         if m = date2.get_month then
             if y = date2.get_year then
                 date_equal := true;
@@ -85,10 +88,10 @@ begin
                 date_less_than := true
             else 
                 date_less_than := false;
-        end;
+        end
             else
-                date_less_than = true;
-    end;
+                date_less_than := true;
+    end
         else 
             date_less_than := false;
 end;  
@@ -108,58 +111,128 @@ begin
         10 : month_str := 'October';
         11 : month_str := 'November';
         12 : month_str := 'December';
-    end;
     else
+        month_str := 'Invalid';
         writeln(StdErr, month, ' is not a valid month');
+    end
 end;
 
-procedure date_t.formatdate (var ret_str : string); 
+procedure date_t.format_date (var ret_str : string); 
 begin 
     ret_str := month_str(m) + ' ' + IntToStr(d) + ',' + IntToStr(y);
 end;
 
 procedure date_t.next_day ();
 begin
-    if d + 1 <= month_length(m, leap_year(y)) then
-        Inc(d);
-    else
+    if (not (d + 1 <= month_length(m, leap_year(y)))) then
+    begin 
         d := 1;
-        if m = 12 then
-            m := 1
-            Inc(y)
-        else
-            Inc(m);
+        if (m = 12) then
+        begin
+            m := 1;
+            y := y + 1;
+        end
+            else 
+            begin
+                m := m + 1;
+            end
+    end
+        else 
+        begin
+            d := d + 1;
+        end;
 end;
-
-
-
-       
+     
 function date_t.leap_year (year : integer) : boolean;
 begin
-    leap_year := year mod 4 = 0;
+    leap_year := ((year mod 4 = 0) and (not (year mod 100 = 0) or (year mod 400 = 0)));
 end;
        
 function date_t.month_length (month : month_range; leap : boolean) : day_range; 
 begin 
-    if (month mod 2 = 1 or month = 8) then
+    if ((month mod 2 = 1) or (month = 8)) then
     begin 
-        if month = 2 then 
+        month_length := 30;
+    end
+        else
         begin
-            if leap then
-                month_length = 29
-            else 
-                month_length = 28;
-        end;
-            else 
-                month_length = 30;
-    end; 
-        else 
-            month_length = 31;
+            if month = 2 then 
+            begin
+                if leap then
+                    month_length := 29
+                else 
+                    month_length := 28;
+            end
+                else
+                    month_length := 31;
+        end;    
+end;
+
+function BetterBoolToStr(bool : boolean) : string;
+begin
+    if bool then
+        BetterBoolToStr := 'TRUE'
+    else
+        BetterBoolToStr := 'FALSE'
 end;
 
 var
     d1,d2,d3 : date_t;
     format_str : string;
 begin
-    writeln('Hello, world!');
+    d1.init_date(6, 10, 2002);
+    d2.init_date(30, 12 , 1999);
+    d3.init_date(1, 1, 2000);
+    d1.format_date(format_str);
+    writeln('d1: ' + format_str);
+    d2.format_date(format_str);
+    writeln('d2: ' + format_str);
+    d3.format_date(format_str);
+    writeln('d3: ' + format_str);
+    writeln;
+    writeln('d1 < d2? ' + BetterBoolToStr(d1.date_less_than(d2)));
+    writeln('d2 < d3? ' + BetterBoolToStr(d2.date_less_than(d3)));
+    d2.next_day;
+    writeln;
+    d2.format_date(format_str);
+    writeln('next day d2: ' + format_str);
+    writeln('d2 < d3? ' + BetterBoolToStr(d2.date_less_than(d3)));
+    writeln('d2 = d3? ' + BetterBoolToStr(d2.date_equal(d3)));
+    writeln('d2 > d3? ' + BetterBoolToStr(d3.date_less_than(d2)));
+    writeln;
+    d2.next_day;
+    d2.format_date(format_str);
+    writeln('next day d2: ' + format_str);
+    writeln('d2 = d3? ' + BetterBoolToStr(d2.date_equal(d3)));
+    writeln;
+    d1.init_date(28, 2, 1529);
+    d1.format_date(format_str);
+    writeln('initialized d1 to ' + format_str);
+    d1.next_day;
+    d1.format_date(format_str);
+    writeln('next day d1: ' + format_str);
+    writeln;
+    d1.init_date(28, 2, 1460);
+    d1.format_date(format_str);
+    writeln('initialized d1 to ' + format_str);
+    d1.next_day;
+    d1.format_date(format_str);
+    writeln('next day d1: ' + format_str);
+    writeln;
+    d1.init_date(28, 2, 1700);
+    d1.format_date(format_str);
+    writeln('initialized d1 to ' + format_str);
+    d1.next_day;
+    d1.format_date(format_str);
+    writeln('next day d1: ' + format_str);
+    writeln;
+    d1.init_date(28, 2, 1600);
+    d1.format_date(format_str);
+    writeln('initialized d1 to ' + format_str);
+    d1.next_day;
+    d1.format_date(format_str);
+    writeln('next day d1: ' + format_str);
+    
+    
+    
 end.
