@@ -71,24 +71,24 @@ end;
 date_t.function date_equal (date2 : date_t) : boolean;
 begin
     date_equal := false;
-    if d = date2.get_date() then 
-        if m = date2.get_month() then
-            if y = date2.get_year() then
+    if d = date2.get_date then 
+        if m = date2.get_month then
+            if y = date2.get_year then
                 date_equal := true;
 end;      
        
 date_t.function date_less_than (date2 : date_t) : boolean;
 begin 
     date_less_than := false;
-    if y < date2.get_year() then 
+    if y < date2.get_year then 
        date_less_than := true
-    else if y = date2.get_year() then 
+    else if y = date2.get_year then 
     begin
-        if m < date2.get_month() then
+        if m < date2.get_month then
             date_less_than := true
-        else if m = date2.get_month() then 
+        else if m = date2.get_month then 
         begin 
-            if d < date2.get_day() then
+            if d < date2.get_day then
                 date_less_than := true
             else 
                 date_less_than := false;
@@ -101,14 +101,54 @@ begin
 end;  
        
 date_t.function month_str (month : month_range) : string;
-       
-date_t.procedure format_date (var dt : date_t; var ret_str : string); 
-       
+begin
+    case (month) of
+        1 : month_str := 'January';
+        2 : month_str := 'February';
+        3 : month_str := 'March';
+        4 : month_str := 'April';
+        5 : month_str := 'May'; 
+        6 : month_str := 'June';
+        7 : month_str := 'July';
+        8 : month_str := 'August';
+        9 : month_str := 'September';
+        10 : month_str := 'October';
+        11 : month_str := 'November';
+        12 : month_str := 'December';
+    end;
+    else
+        writeln(StdErr, month, ' is not a valid month');
+end;
+
+date_t.procedure formatdate (var dt : date_t; var ret_str : string); 
+begin 
+    ret_str := month_str(dt.get_month) + ' ' + IntToStr(dt.get_day) + ',' + IntToStr(dt.get_year);
+end;
+
 date_t.procedure next_day (var dt : date_t);
        
 date_t.function leap_year (year : integer) : boolean;
+begin
+    leap_year := year mod 4 = 0;
+end;
        
 date_t.function month_length (month : month_range; leap : boolean) : day_range; 
+begin 
+    if (month mod 2 = 1 or month = 8) then
+    begin 
+        if month = 2 then 
+        begin
+            if leap then
+                month_length = 29
+            else 
+                month_length = 28;
+        end;
+            else 
+                month_length = 30;
+    end; 
+        else 
+            month_length = 31;
+end;
 
 var
     d1,d2,d3 : date_t;
