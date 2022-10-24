@@ -25,15 +25,11 @@ type
        
        function date_less_than (date2 : date_t) : boolean;
        
-       function month_str (month : month_range) : string;
+       function month_str () : string;
        
        procedure format_date (var ret_str : string); 
        
        procedure next_day ();
-       
-       function leap_year (year : integer) : boolean;
-       
-       function month_length (month : month_range; leap : boolean) : day_range; 
 end;
 
 function date_t.get_day () : day_range;
@@ -52,7 +48,15 @@ begin
 end;
        
 procedure date_t.init_date1 ();
-begin
+var 
+    day : word;
+    month : word;
+    year : word;
+begin 
+    DecodeDate (Date, year, month, day);
+    d := day;
+    m := month;
+    y := year;
 end;
      
 procedure date_t.init_date (day : day_range; month : month_range; year : integer);
@@ -60,8 +64,6 @@ begin
     y := year;
     m := month;
     d := day;
-    if (d > month_length(m, leap_year(y))) then
-        writeln(StdErr, 'Date is Invalid'); 
 end;
        
 function date_t.date_equal (date2 : date_t) : boolean;
@@ -96,9 +98,9 @@ begin
             date_less_than := false;
 end;  
        
-function date_t.month_str (month : month_range) : string;
+function date_t.month_str () : string;
 begin
-    case (month) of
+    case (m) of
         1 : month_str := 'January';
         2 : month_str := 'February';
         3 : month_str := 'March';
@@ -113,18 +115,47 @@ begin
         12 : month_str := 'December';
     else
         month_str := 'Invalid';
-        writeln(StdErr, month, ' is not a valid month');
+        writeln(StdErr, m, ' is not a valid month');
     end
 end;
 
 procedure date_t.format_date (var ret_str : string); 
 begin 
-    ret_str := month_str(m) + ' ' + IntToStr(d) + ',' + IntToStr(y);
+    ret_str := month_str() + ' ' + IntToStr(d) + ',' + IntToStr(y);
 end;
 
 procedure date_t.next_day ();
+
+    function month_length () : day_range; 
+
+            function leap_year () : boolean;
+            begin
+                leap_year := ((y mod 4 = 0) and (not (y mod 100 = 0) or (y mod 400 = 0)));
+            end;
+    var
+        leap : boolean;
+    begin 
+        leap := leap_year();
+        if ((m mod 2 = 1) or (m = 8)) then
+        begin 
+            month_length := 30;
+        end
+            else
+            begin
+                if m = 2 then 
+                begin
+                    if leap then
+                        month_length := 29
+                    else 
+                        month_length := 28;
+                end
+                    else
+                        month_length := 31;
+            end;    
+    end;
+    
 begin
-    if (not (d + 1 <= month_length(m, leap_year(y)))) then
+    if (not (d + 1 <= month_length())) then
     begin 
         d := 1;
         if (m = 12) then
@@ -142,31 +173,6 @@ begin
             d := d + 1;
         end;
 end;
-     
-function date_t.leap_year (year : integer) : boolean;
-begin
-    leap_year := ((year mod 4 = 0) and (not (year mod 100 = 0) or (year mod 400 = 0)));
-end;
-       
-function date_t.month_length (month : month_range; leap : boolean) : day_range; 
-begin 
-    if ((month mod 2 = 1) or (month = 8)) then
-    begin 
-        month_length := 30;
-    end
-        else
-        begin
-            if month = 2 then 
-            begin
-                if leap then
-                    month_length := 29
-                else 
-                    month_length := 28;
-            end
-                else
-                    month_length := 31;
-        end;    
-end;
 
 function BetterBoolToStr(bool : boolean) : string;
 begin
@@ -180,7 +186,7 @@ var
     d1,d2,d3 : date_t;
     format_str : string;
 begin
-    d1.init_date(6, 10, 2002);
+    d1.init_date1();
     d2.init_date(30, 12 , 1999);
     d3.init_date(1, 1, 2000);
     d1.format_date(format_str);
@@ -232,7 +238,4 @@ begin
     d1.next_day;
     d1.format_date(format_str);
     writeln('next day d1: ' + format_str);
-    
-    
-    
 end.

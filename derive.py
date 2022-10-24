@@ -1,7 +1,5 @@
 #Vinny ALlegra , Simple Deriver for CFGs 
 
-from ast import Str
-from asyncio.windows_events import NULL
 import sys, getopt
 
 # param string: String that is being checked in worklist
