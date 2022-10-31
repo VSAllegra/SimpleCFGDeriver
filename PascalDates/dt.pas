@@ -5,88 +5,53 @@ Uses sysutils;
 type  
    day_range = 1 .. 31;
    month_range = 1 .. 12;
-   date_t = object
-   private 
-       d : day_range;
-       m : month_range;
-       y : integer;
-   public
-       function get_day () : day_range;
-       
-       function get_month () : month_range;
-       
-       function get_year () : integer;
-       
-       procedure init_date1 ();
-       
-       procedure init_date (day : day_range; month : month_range; year : integer);
-       
-       function date_equal (date2 : date_t) : boolean;
-       
-       function date_less_than (date2 : date_t) : boolean;
-       
-       function month_str () : string;
-       
-       procedure format_date (var ret_str : string); 
-       
-       procedure next_day ();
+   date_t = record
+       day : day_range;
+       month : month_range;
+       year : integer;
 end;
 
-function date_t.get_day () : day_range;
-begin 
-   get_day := d;
-end;
-       
-function date_t.get_month () : month_range;
-begin
-    get_month := m;
-end;
-       
-function date_t.get_year () : integer;
-begin
-    get_year := y;
-end;
-       
-procedure date_t.init_date1 ();
+   
+procedure date_t.init_date1 (date : date_t);
 var 
     day : word;
     month : word;
     year : word;
 begin 
     DecodeDate (Date, year, month, day);
-    d := day;
-    m := month;
-    y := year;
+    date.day := day;
+    date.month := month;
+    date.year := year;
 end;
      
-procedure date_t.init_date (day : day_range; month : month_range; year : integer);
+procedure date_t.init_date (date : date_t; day : day_range; month : month_range; year : integer);
 begin
-    y := year;
-    m := month;
-    d := day;
+    date.year:= year;
+    date.month := month;
+    date.day := day;
 end;
        
-function date_t.date_equal (date2 : date_t) : boolean;
+function date_t.date_equal (date1 : date_t; date2 : date_t) : boolean;
 begin
     date_equal := false;
-    if d = date2.get_day then 
-        if m = date2.get_month then
-            if y = date2.get_year then
+    if date1.day = date2.day then 
+        if date1.month = date2.month then
+            if date1.year = date2.year then
                 date_equal := true;
 end;      
        
-function date_t.date_less_than (date2 : date_t) : boolean;
+function date_t.date_less_than (date1 : date_t; date2 : date_t) : boolean;
 begin 
     date_less_than := false;
-    if y < date2.get_year then 
+    if date1.year < date2.year then 
        date_less_than := true
-    else if y = date2.get_year then 
+    else if date1.year = date2.year then 
     begin
-        if m < date2.get_month then
+        if date1.month < date2.month then
             date_less_than := true
-        else if m = date2.get_month then 
+        else if date1.month = date2.month then 
         begin 
-            if d < date2.get_day then
+            if date1.day < date2.day then
                 date_less_than := true
             else 
                 date_less_than := false;
@@ -98,9 +63,9 @@ begin
             date_less_than := false;
 end;  
        
-function date_t.month_str () : string;
+function date_t.month_str (date : date_t) : string;
 begin
-    case (m) of
+    case (date.month) of
         1 : month_str := 'January';
         2 : month_str := 'February';
         3 : month_str := 'March';
@@ -119,30 +84,30 @@ begin
     end
 end;
 
-procedure date_t.format_date (var ret_str : string); 
+procedure date_t.format_date (date : date_t, var ret_str : string); 
 begin 
-    ret_str := month_str() + ' ' + IntToStr(d) + ',' + IntToStr(y);
+    ret_str := month_str(date) + ' ' + IntToStr(date.day) + ',' + IntToStr(date.year);
 end;
 
-procedure date_t.next_day ();
+procedure date_t.next_day (date : date_t);
 
-    function month_length () : day_range; 
+    function month_length (date : date_t) : day_range; 
 
-            function leap_year () : boolean;
+            function leap_year (year : integer) : boolean;
             begin
-                leap_year := ((y mod 4 = 0) and (not (y mod 100 = 0) or (y mod 400 = 0)));
+                leap_year := ((year mod 4 = 0) and (not (year mod 100 = 0) or (year mod 400 = 0)));
             end;
     var
         leap : boolean;
     begin 
-        leap := leap_year();
-        if ((m mod 2 = 1) or (m = 8)) then
+        leap := leap_year(date.year);
+        if ((date.month mod 2 = 1) or (date.month = 8)) then
         begin 
             month_length := 30;
         end
             else
             begin
-                if m = 2 then 
+                if date.month = 2 then 
                 begin
                     if leap then
                         month_length := 29
@@ -155,22 +120,22 @@ procedure date_t.next_day ();
     end;
     
 begin
-    if (not (d + 1 <= month_length())) then
+    if (not (date.day + 1 <= month_length(date))) then
     begin 
-        d := 1;
-        if (m = 12) then
+        date.day := 1;
+        if (date.month = 12) then
         begin
-            m := 1;
-            y := y + 1;
+            date.month := 1;
+            date.year := date.year + 1;
         end
             else 
             begin
-                m := m + 1;
+                date.month := date.month + 1;
             end
     end
         else 
         begin
-            d := d + 1;
+            date.day := date.day + 1;
         end;
 end;
 

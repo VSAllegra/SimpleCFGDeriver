@@ -1,5 +1,4 @@
 #Vinny ALlegra , Simple Deriver for CFGs 
-
 import sys, getopt
 
 # param string: String that is being checked in worklist
